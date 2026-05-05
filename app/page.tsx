@@ -1,101 +1,140 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import ProgressBar from "@/components/ProgressBar";
+import PhoneBlocker from "@/components/PhoneBlocker";
+
+const S: React.CSSProperties = { fontFamily: "var(--font-mono)" };
+
+export default function WelcomePage() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [device, setDevice] = useState("");
+  const [error, setError] = useState("");
+
+  function handleBegin() {
+    if (!name.trim()) { setError("Please enter your full name."); return; }
+    if (!device) { setError("Please select your device."); return; }
+    sessionStorage.setItem("fitts_name", name.trim());
+    sessionStorage.setItem("fitts_device", device);
+    sessionStorage.removeItem("fitts_mt1");
+    sessionStorage.removeItem("fitts_mt2");
+    router.push("/trial1-instructions");
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen" style={{ background: "#0a0a0a", color: "#e8e8e8" }}>
+      <PhoneBlocker />
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <ProgressBar current={0} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <header className="mb-8">
+          <h1 style={{ ...S, fontSize: "1.5rem", fontWeight: 700, color: "#c8ff00" }}>
+            SCO307 — Fitts&apos; Law Experiment
+          </h1>
+          <p style={{ ...S, fontSize: "0.8rem", color: "#666666", marginTop: "4px" }}>
+            Question 5 · Group Data Collection
+          </p>
+        </header>
+
+        {/* Warning */}
+        <div
+          className="flex gap-3 p-4 mb-6"
+          style={{ border: "1px solid #ff3b3b", background: "rgba(255,59,59,0.07)" }}
+        >
+          <span style={{ color: "#ff3b3b", fontWeight: 700, fontSize: "1.1rem", flexShrink: 0 }}>⚠</span>
+          <p style={{ ...S, fontSize: "0.8rem", color: "#ff3b3b", lineHeight: 1.6 }}>
+            LAPTOP / DESKTOP ONLY. You must use a mouse or trackpad on a laptop or desktop.
+            Do NOT use a phone or tablet. Phone results are physically invalid (touchscreen ≠ mouse)
+            and will be caught during oral defence.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Explanation */}
+        <div className="p-5 mb-8" style={{ border: "1px solid #252525", background: "#111111" }}>
+          <h2
+            style={{ ...S, fontSize: "0.7rem", color: "#c8ff00", fontWeight: 700,
+              textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px" }}
+          >
+            What You Will Do
+          </h2>
+          <p style={{ fontSize: "0.875rem", lineHeight: 1.7, marginBottom: "12px" }}>
+            You will complete two short clicking trials (about 30 seconds each). In each trial,
+            two rectangles appear on screen. The bright yellow one is your target — click it,
+            then click the next yellow one. Keep going until the trial ends automatically after
+            10 clicks. The timer runs from your first click to your tenth.
+          </p>
+          <p style={{ fontSize: "0.875rem", lineHeight: 1.7 }}>
+            Trial 1 uses a wider target (easier). Trial 2 uses a narrower target (harder).
+            Your movement time (MT) for each trial is the total time for all 10 clicks in seconds.
+          </p>
+        </div>
+
+        {/* Form */}
+        <div className="p-5 mb-6" style={{ border: "1px solid #252525", background: "#111111" }}>
+          <div className="mb-5">
+            <label
+              style={{ ...S, display: "block", fontSize: "0.7rem", color: "#666666",
+                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}
+            >
+              Your Full Name *
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => { setName(e.target.value); setError(""); }}
+              placeholder="e.g. Jane Wanjiku Kamau"
+              style={{
+                width: "100%", background: "#0a0a0a", border: "1px solid #252525",
+                color: "#e8e8e8", padding: "8px 12px", fontSize: "0.875rem",
+                outline: "none", fontFamily: "var(--font-mono)",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#c8ff00")}
+              onBlur={(e) => (e.target.style.borderColor = "#252525")}
+            />
+          </div>
+          <div>
+            <label
+              style={{ ...S, display: "block", fontSize: "0.7rem", color: "#666666",
+                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}
+            >
+              Device You Are Using *
+            </label>
+            <select
+              value={device}
+              onChange={(e) => { setDevice(e.target.value); setError(""); }}
+              style={{
+                width: "100%", background: "#0a0a0a", border: "1px solid #252525",
+                color: device ? "#e8e8e8" : "#666666", padding: "8px 12px",
+                fontSize: "0.875rem", outline: "none", fontFamily: "var(--font-mono)",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#c8ff00")}
+              onBlur={(e) => (e.target.style.borderColor = "#252525")}
+            >
+              <option value="">Select device...</option>
+              <option value="Laptop + Mouse">Laptop + Mouse</option>
+              <option value="Laptop Trackpad">Laptop Trackpad</option>
+              <option value="Desktop + Mouse">Desktop + Mouse</option>
+            </select>
+          </div>
+          {error && (
+            <p style={{ ...S, color: "#ff3b3b", fontSize: "0.75rem", marginTop: "12px" }}>{error}</p>
+          )}
+        </div>
+
+        <button
+          onClick={handleBegin}
+          style={{
+            width: "100%", background: "#c8ff00", color: "#000",
+            fontFamily: "var(--font-mono)", fontWeight: 700, padding: "12px",
+            fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "0.05em",
+            border: "none", cursor: "pointer",
+          }}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Begin Experiment →
+        </button>
+      </div>
     </div>
   );
 }
